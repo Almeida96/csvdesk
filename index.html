@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Open, inspect, clean, and export CSV files locally in your browser.">
+  <meta name="color-scheme" content="light">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>CSV Desk</title>
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./style.css">
+  <script type="module" src="./src/app.js"></script>
+</head>
+<body>
+  <a href="#workspace" class="skip-link">Skip to table</a>
+  <header class="topbar">
+    <a class="brand" href="./"><img src="./icon.svg" width="32" height="32" alt="">CSV Desk <span>0.1.0</span></a>
+    <nav aria-label="Project"><span class="privacy"><span aria-hidden="true">●</span> Files stay in your browser</span><a href="https://github.com/Almeida96/csvdesk">GitHub <span aria-hidden="true">↗</span></a></nav>
+  </header>
+  <main>
+    <div class="page-heading"><div><p class="eyebrow">CSV WORKSPACE</p><div class="file-heading"><h1 id="filename">Open a CSV file</h1><span id="sample-label" class="tag" hidden>Sample</span></div><p id="file-detail">Up to 10 MiB · 50,000 rows · 100 columns</p></div><div class="heading-actions"><button id="undo" disabled>Undo <span aria-hidden="true">↶</span></button><button id="export" class="primary" disabled>Export CSV <span aria-hidden="true">↓</span></button></div></div>
+    <div id="error" class="error" role="alert" hidden></div>
+    <div class="layout">
+      <aside aria-label="File tools">
+        <section class="open-panel">
+          <button id="open" class="dropzone"><span class="file-symbol" aria-hidden="true">↥</span><strong>Open CSV</strong><span>or drop a file here</span><small>CSV and TSV · max. 10 MiB</small></button>
+          <input id="file-input" type="file" accept=".csv,.tsv,text/csv,text/tab-separated-values" hidden>
+          <button id="sample" class="text-button">Load sample file</button>
+        </section>
+        <section class="tool-section"><h2>Import settings</h2>
+          <label for="delimiter">Separator</label><select id="delimiter"><option value="auto">Detect automatically</option><option value=",">Comma (,)</option><option value=";">Semicolon (;)</option><option value="tab">Tab</option><option value="|">Pipe (|)</option></select>
+          <label for="encoding">Encoding</label><select id="encoding"><option value="utf-8">UTF-8</option><option value="windows-1252">Windows-1252</option></select>
+          <label class="check"><input id="has-header" type="checkbox" checked>First row contains column names</label>
+          <button id="reimport" class="wide" disabled>Apply import settings</button><p class="help">Reloads the original file and clears cleanup history.</p>
+        </section>
+        <section class="tool-section cleanup"><div class="section-heading"><h2>Clean up</h2><span>All rows</span></div>
+          <button id="trim" disabled><span>Trim cell spaces</span><span id="space-count" class="count">0</span></button>
+          <button id="empty" disabled><span>Remove empty rows</span><span id="empty-count" class="count">0</span></button>
+          <button id="duplicates" disabled><span>Remove duplicates</span><span id="duplicate-count" class="count">0</span></button>
+          <p class="help">Duplicates match across every column. Undo keeps the last 10 cleanup steps.</p>
+        </section>
+        <p class="session-note">Files are kept in memory for this session. Export your changes before closing the page.</p>
+      </aside>
+      <section id="workspace" class="data-panel" aria-label="CSV table" tabindex="-1">
+        <div class="stats"><div><strong id="row-count">0</strong><span>rows</span></div><div><strong id="column-count">0</strong><span>columns</span></div><div><strong id="blank-count">0</strong><span>empty cells</span></div><div class="format-stat"><span class="format-dot" aria-hidden="true"></span><span id="detected">No file loaded</span></div></div>
+        <div class="table-toolbar"><label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Search all columns…" aria-label="Search all columns" disabled></label><button id="reset-view" class="text-button" disabled>Reset view</button></div>
+        <p id="import-note" class="import-note" hidden></p>
+        <div id="table-scroll" class="table-scroll" tabindex="0" role="region" aria-label="Scrollable data table"><table><caption class="sr-only">Imported CSV records. Select a column heading to sort.</caption><thead id="table-head"></thead><tbody id="table-body"></tbody></table><div id="empty-view" class="empty-view"><strong>No data loaded</strong><p>Open a file or load the sample to get started.</p></div></div>
+        <div class="pagination"><span id="page-info">0 rows</span><div><button id="previous" aria-label="Previous page" disabled>←</button><span id="page-number">Page 1 of 1</span><button id="next" aria-label="Next page" disabled>→</button></div></div>
+        <div class="activity"><span aria-hidden="true">↳</span><p id="status" role="status" aria-live="polite">Ready to open a file.</p></div>
+      </section>
+    </div>
+    <footer><span>CSV Desk</span><span>No account, uploads, or browser storage.</span><a href="https://github.com/Almeida96/csvdesk#file-handling">File handling</a></footer>
+  </main>
+  <dialog id="export-dialog" aria-labelledby="export-title">
+    <div class="dialog-heading"><div><p class="eyebrow">DOWNLOAD</p><h2 id="export-title">Export CSV</h2></div><button id="close-export" class="close-button" aria-label="Close export">×</button></div>
+    <p id="export-summary"></p>
+    <label for="export-name">File name</label><input id="export-name" type="text" value="data-cleaned.csv" maxlength="180">
+    <div class="form-row"><div><label for="export-scope">Rows</label><select id="export-scope"><option value="all">All rows, original order</option><option value="view">Matching rows, current sort</option></select></div><div><label for="export-delimiter">Separator</label><select id="export-delimiter"><option value=",">Comma (,)</option><option value=";">Semicolon (;)</option><option value="tab">Tab</option><option value="|">Pipe (|)</option></select></div></div>
+    <fieldset><legend>Columns</legend><div id="export-columns" class="column-checks"></div></fieldset>
+    <label class="check"><input id="export-header" type="checkbox" checked>Include column names</label>
+    <label class="check"><input id="export-bom" type="checkbox" checked>Add a UTF-8 BOM for spreadsheet apps</label>
+    <label class="check"><input id="escape-formulas" type="checkbox" checked>Prefix formula-like cells with an apostrophe</label>
+    <p class="help">This changes cells starting with characters such as =, +, - or @. Turn it off to preserve those values exactly. Spreadsheet behavior varies.</p>
+    <p id="export-error" class="error" role="alert" hidden></p>
+    <div class="dialog-actions"><span>UTF-8 · CRLF line endings</span><button id="download" class="primary">Download CSV</button></div>
+  </dialog>
+  <noscript><p class="error">Enable JavaScript to open and edit CSV files. Files are processed in your browser.</p></noscript>
+</body>
+</html>

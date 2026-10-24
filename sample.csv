@@ -1,0 +1,25 @@
+sku,product,category,stock,location,unit_price
+NB-001,  Grid notebook,Stationery,48,A-01,6.50
+PN-002,Black ink pen,Stationery,120,A-02,1.80
+MG-003,Stoneware mug,Kitchen,24,B-01,14.00
+TT-004,Cotton tea towel,Kitchen,36,B-02,8.50
+LB-005,Desk lamp,Lighting,12,C-01,42.00
+PT-006,Terracotta pot,Garden,18,D-01,11.00
+BK-007,Bookend pair,Office,9,C-03,19.50
+TB-008,Canvas tote,Accessories,60,E-01,12.00
+SC-009,Steel scissors ,Stationery,32,A-03,7.25
+CL-010,Brass clip set,Stationery,45,A-04,4.00
+CN-011,Cedar candle,Home,16,B-03,18.00
+WB-012,Glass water bottle,Kitchen,28,B-04,16.00
+MG-003,Stoneware mug,Kitchen,24,B-01,14.00
+,,,,,
+TR-013,"Serving tray, oak",Kitchen,8,B-05,32.00
+WL-014,Wool blanket,Home,7,E-02,65.00
+PC-015,Pencil case,Stationery,22,A-05,9.00
+PL-016,Small planter,Garden,14,,13.50
+NB-001,  Grid notebook,Stationery,48,A-01,6.50
+HK-017,Wall hook set,Home,31,C-04,8.00
+MT-018, Cork desk mat ,Office,11,C-05,21.00
+ST-019,Storage tin,Kitchen,19,B-06,10.00
+PK-020,Postcard pack,Stationery,80,A-06,5.00
+BR-021,Soft brush,Garden,25,D-02,6.00
