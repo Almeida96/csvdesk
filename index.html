@@ -14,7 +14,7 @@
 <body>
   <a href="#workspace" class="skip-link">Skip to table</a>
   <header class="topbar">
-    <a class="brand" href="./"><img src="./icon.svg" width="32" height="32" alt="">CSV Desk <span>0.1.0</span></a>
+    <a class="brand" href="./"><img src="./icon.svg" width="32" height="32" alt="">CSV Desk <span>0.2.0</span></a>
     <nav aria-label="Project"><span class="privacy"><span aria-hidden="true">●</span> Files stay in your browser</span><a href="https://github.com/Almeida96/csvdesk">GitHub <span aria-hidden="true">↗</span></a></nav>
   </header>
   <main>
@@ -37,7 +37,7 @@
           <button id="trim" disabled><span>Trim cell spaces</span><span id="space-count" class="count">0</span></button>
           <button id="empty" disabled><span>Remove empty rows</span><span id="empty-count" class="count">0</span></button>
           <button id="duplicates" disabled><span>Remove duplicates</span><span id="duplicate-count" class="count">0</span></button>
-          <p class="help">Duplicates match across every column. Undo keeps the last 10 cleanup steps.</p>
+          <p class="help">Choose columns to match duplicates. The badge counts identical rows. Undo keeps the last 10 cleanup steps.</p>
         </section>
         <p class="session-note">Files are kept in memory for this session. Export your changes before closing the page.</p>
       </aside>
@@ -64,6 +64,18 @@
     <p class="help">This changes cells starting with characters such as =, +, - or @. Turn it off to preserve those values exactly. Spreadsheet behavior varies.</p>
     <p id="export-error" class="error" role="alert" hidden></p>
     <div class="dialog-actions"><span>UTF-8 · CRLF line endings</span><button id="download" class="primary">Download CSV</button></div>
+  </dialog>
+  <dialog id="dedupe-dialog" aria-labelledby="dedupe-title">
+    <div class="dialog-heading"><h2 id="dedupe-title">Match duplicate rows</h2><button id="dedupe-close" class="close-button" aria-label="Close duplicate matching">×</button></div>
+    <p>For example, select an email or SKU column to find repeated records even when other values differ.</p>
+    <fieldset><legend>Match these columns</legend><div id="dedupe-columns" class="column-checks"></div></fieldset>
+    <label for="dedupe-keep">Row to keep</label><select id="dedupe-keep"><option value="first">First in the original file</option><option value="last">Last in the original file</option></select>
+    <label class="check"><input id="dedupe-trim" type="checkbox">Ignore spaces at the edges when matching</label>
+    <label class="check"><input id="dedupe-case" type="checkbox">Ignore letter case when matching</label>
+    <label class="check"><input id="dedupe-blank" type="checkbox" checked>Keep rows with an empty key field</label>
+    <p class="help">Matching options do not change the retained cell values.</p>
+    <p id="dedupe-summary" role="status" aria-live="polite"></p>
+    <div class="dialog-actions"><span>Undo is available after applying.</span><button id="dedupe-apply" class="primary">Remove matching duplicates</button></div>
   </dialog>
   <noscript><p class="error">Enable JavaScript to open and edit CSV files. Files are processed in your browser.</p></noscript>
 </body>

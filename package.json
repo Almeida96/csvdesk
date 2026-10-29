@@ -1,12 +1,14 @@
 {
   "name": "csvdesk",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Inspect, clean, and export CSV files in your browser.",
   "type": "module",
   "license": "MIT",
   "author": "Igor Almeida",
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "node scripts/serve.mjs",
     "build": "node scripts/build.mjs",

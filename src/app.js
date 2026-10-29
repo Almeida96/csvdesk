@@ -1,5 +1,5 @@
 import { LIMITS, serializeCSV } from './csv.js';
-import { analyze, cleanTable, viewRows, exportRows } from './table.js';
+import { analyze, cleanTable, deduplicate, viewRows, exportRows } from './table.js';
 
 const $ = id => document.getElementById(id);
 const delimiterValue = value => value === 'tab' ? '\t' : value;
@@ -21,7 +21,7 @@ function controls() {
   $('undo').disabled = busy || !history.length;
   $('trim').disabled = busy || !statistics?.spaces;
   $('empty').disabled = busy || !statistics?.empty;
-  $('duplicates').disabled = busy || !statistics?.duplicates;
+  $('duplicates').disabled = busy || !table || table.rows.length < 2;
   $('reset-view').disabled = busy || (!($('search').value) && sortColumn === -1);
   $('previous').disabled = busy || page === 0;
   $('next').disabled = busy || (page + 1) * pageSize >= indices.length;
@@ -161,11 +161,11 @@ document.addEventListener('dragleave', event => { if (!event.relatedTarget) docu
 document.addEventListener('drop', event => {
   if (!event.dataTransfer.types.includes('Files')) return;
   event.preventDefault(); document.body.classList.remove('drag-over');
-  if (busy || $('export-dialog').open) return;
+  if (busy || $('export-dialog').open || $('dedupe-dialog').open) return;
   if (event.dataTransfer.files.length !== 1) { error('Drop one CSV file at a time.'); return; }
   openSource({ file: event.dataTransfer.files[0], sample: false });
 });
-for (const operation of ['trim', 'empty', 'duplicates']) {
+for (const operation of ['trim', 'empty']) {
   $(operation).addEventListener('click', () => {
     const result = cleanTable(table, operation);
     if (!result.changed) return;
@@ -178,6 +178,35 @@ for (const operation of ['trim', 'empty', 'duplicates']) {
 $('undo').addEventListener('click', () => {
   if (!history.length) return;
   table = history.pop(); renderTable(); error(); message('Last cleanup step undone.');
+});
+
+function duplicatePreview() {
+  const columns = [...$('dedupe-columns').querySelectorAll('input:checked')].map(input => Number(input.value));
+  return deduplicate(table, columns, { keep: $('dedupe-keep').value, trim: $('dedupe-trim').checked, ignoreCase: $('dedupe-case').checked, skipBlank: $('dedupe-blank').checked });
+}
+function updateDuplicatePreview() {
+  try {
+    const result = duplicatePreview();
+    $('dedupe-summary').textContent = `${countLabel(result.changed, 'row')} will be removed; ${countLabel(result.table.rows.length, 'row')} will remain. Matches use all rows in their original order.`;
+    $('dedupe-apply').disabled = !result.changed;
+  } catch (cause) { $('dedupe-summary').textContent = cause.message; $('dedupe-apply').disabled = true; }
+}
+$('duplicates').addEventListener('click', () => {
+  $('dedupe-columns').replaceChildren(...table.headers.map((_, index) => {
+    const label = document.createElement('label'); label.className = 'check';
+    const checkbox = document.createElement('input'); checkbox.type = 'checkbox'; checkbox.value = String(index); checkbox.checked = true;
+    label.append(checkbox, document.createTextNode(`${columnName(index)} (${index + 1})`)); return label;
+  }));
+  updateDuplicatePreview(); $('dedupe-dialog').showModal();
+});
+$('dedupe-dialog').addEventListener('change', updateDuplicatePreview);
+$('dedupe-close').addEventListener('click', () => $('dedupe-dialog').close());
+$('dedupe-apply').addEventListener('click', () => {
+  const result = duplicatePreview();
+  if (!result.changed) return;
+  history.push(table); if (history.length > 10) history.shift();
+  table = result.table; page = 0; renderTable(); error(); $('dedupe-dialog').close();
+  message(`Removed ${countLabel(result.changed, 'duplicate row')} using selected columns. Undo is available.`);
 });
 $('search').addEventListener('input', () => {
   clearTimeout(searchTimer);
