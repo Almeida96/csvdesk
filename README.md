@@ -11,11 +11,19 @@ Open a CSV, check its contents, and download a cleaned copy. Files are processed
 Open a CSV or TSV file, or use the included inventory sample. Choose the separator and encoding before opening a file if automatic detection does not fit your data. **Apply import settings** reloads the original file and clears cleanup history.
 
 - Search across all columns. Click a column heading to sort; click it again to reverse the order.
-- Trim spaces at the edges of data cells, remove empty rows, or remove exact duplicate rows. Cleanup applies to the entire file, including rows hidden by search.
+- Trim spaces at the edges of data cells, remove empty rows, or match duplicates by selected columns. Cleanup applies to the entire file, including rows hidden by search.
 - Undo up to 10 cleanup steps. Search and sorting only change the view.
 - Export all rows in their original order, or matching rows in the current sort order. Choose which columns to include and whether to write a header.
 
 Duplicate removal keeps the first matching row and compares every column, including case and spaces. Trim first if you want `" item "` and `"item"` to count as the same value. Trimming leaves column names unchanged.
+
+## Match duplicates by key
+
+Use **Remove duplicates** to choose the columns that identify a record, such as an email, a SKU, or an account-and-date pair. The preview shows how many rows will be removed before applying the change. Keep either the first or last occurrence in the original file; sorting the table does not change that choice.
+
+Case folding and trimming are optional comparison rules. They do not rewrite retained values. Rows with any empty key field are kept by default, so incomplete records are not silently collapsed. Uncheck that option to treat empty fields as ordinary values. Matching is exact after the selected normalization; it is not fuzzy matching.
+
+For example, select `email` and keep the last occurrence to retain an updated contact even if its name or phone differs. Undo restores the complete previous table. The sidebar badge counts full-row duplicates; the dialog calculates matches for the selected keys.
 
 ## File handling
 

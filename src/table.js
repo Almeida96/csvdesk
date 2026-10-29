@@ -53,6 +53,27 @@ export function cleanTable(table, operation) {
   return { table: changed ? { ...table, rows } : table, changed };
 }
 
+/** Match selected key columns; retained rows keep their original order. */
+export function deduplicate(table, columns, { keep = 'first', ignoreCase = false, trim = false, skipBlank = true } = {}) {
+  if (!Array.isArray(columns) || !columns.length || columns.some(i => !Number.isInteger(i) || i < 0 || i >= table.headers.length) || new Set(columns).size !== columns.length) throw new Error('Choose one or more distinct key columns.');
+  if (!['first', 'last'].includes(keep)) throw new Error('Keep must be first or last.');
+  if ([ignoreCase, trim, skipBlank].some(v => typeof v !== 'boolean')) throw new Error('Matching options must be booleans.');
+  const selected = new Map(), retained = new Set();
+  table.rows.forEach((row, index) => {
+    const cells = columns.map(i => row[i]);
+    if (skipBlank && cells.some(cell => !cell.trim())) { retained.add(index); return; }
+    const key = JSON.stringify(cells.map(cell => {
+      const value = trim ? cell.trim() : cell;
+      return ignoreCase ? value.toLowerCase() : value;
+    }));
+    if (keep === 'last' || !selected.has(key)) selected.set(key, index);
+  });
+  for (const index of selected.values()) retained.add(index);
+  const rows = table.rows.filter((_, index) => retained.has(index));
+  const changed = table.rows.length - rows.length;
+  return { table: changed ? { ...table, rows } : table, changed };
+}
+
 const collator = new Intl.Collator('en', { numeric: true, sensitivity: 'base' });
 
 export function viewRows(table, query = '', column = -1, direction = 'asc') {
