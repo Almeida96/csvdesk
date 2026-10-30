@@ -1,5 +1,7 @@
 # CSV Desk
 
+[![CI](https://github.com/Almeida96/csvdesk/actions/workflows/ci.yml/badge.svg)](https://github.com/Almeida96/csvdesk/actions/workflows/ci.yml)
+
 Open a CSV, check its contents, and download a cleaned copy. Files are processed in the browser and kept in memory until you close or reload the page.
 
 [Open CSV Desk](https://almeida96.github.io/csvdesk/)
@@ -83,4 +85,4 @@ Tests cover quoted fields, encoding failures, limits, uneven rows, cleanup order
 
 GitHub Actions runs checks on Linux, Windows, and macOS. After they pass on `main`, the Pages job publishes `dist/`. The parser's quoting rules follow [RFC 4180](https://www.rfc-editor.org/rfc/rfc4180); the other separators and line endings are additional supported inputs.
 
-MIT license. See [LICENSE](LICENSE).
+[Contributing](CONTRIBUTING.md) · [Changelog](CHANGELOG.md) · [MIT license](LICENSE).
